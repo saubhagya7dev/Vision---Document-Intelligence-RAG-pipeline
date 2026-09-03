@@ -46,4 +46,4 @@ class GeminiGenerator(BaseVLMGenerator):
             contents=contents
         )
         
-        return response.text
+        return str(response.text)
