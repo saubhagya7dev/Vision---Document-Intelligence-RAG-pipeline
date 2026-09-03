@@ -1,0 +1,44 @@
+[project]
+name = "vision-native-rag"
+version = "0.1.0"
+description = "OCR-free, Vision-Native RAG pipeline using Vision-Language Models"
+authors = [
+    {name = "User", email = "user@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "pydantic-settings>=2.0",
+    "qdrant-client>=1.7",
+    "pdf2image>=1.16",
+    "google-genai>=0.1.0",
+    "torch>=2.0",
+    "transformers>=4.30",
+    "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1",
+    "mypy>=1.5",
+    "pre-commit>=3.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
