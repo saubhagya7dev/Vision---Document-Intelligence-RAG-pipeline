@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Any
 from PIL import Image
 from google import genai
 
@@ -29,7 +29,7 @@ class GeminiGenerator(BaseVLMGenerator):
         
         # Prepare the prompt contents
         # Gemini API accepts a list of text and images
-        contents = [
+        contents: List[Any] = [
             "You are a helpful assistant. Answer the user's question based strictly on the provided document pages (images).",
             f"Question: {query}",
             "Document Pages:"

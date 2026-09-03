@@ -1,5 +1,5 @@
 import torch
-from typing import List, Any
+from typing import List, Any, cast
 from PIL import Image
 from transformers import AutoProcessor, AutoModel
 
@@ -44,7 +44,7 @@ class ColPaliEmbeddingModel(BaseEmbeddingModel):
         inputs = self.processor(images=images, return_tensors="pt").to(self.device)
         # ColPali outputs multi-vector embeddings (batch_size, num_patches, hidden_dim)
         embeddings = self.model(**inputs).last_hidden_state
-        return embeddings.cpu().tolist()
+        return cast(List[Any], embeddings.cpu().tolist())
         
     @torch.no_grad()
     def encode_queries(self, queries: List[str]) -> List[Any]:
@@ -54,4 +54,4 @@ class ColPaliEmbeddingModel(BaseEmbeddingModel):
             
         inputs = self.processor(text=queries, return_tensors="pt", padding=True).to(self.device)
         embeddings = self.model(**inputs).last_hidden_state
-        return embeddings.cpu().tolist()
+        return cast(List[Any], embeddings.cpu().tolist())
