@@ -12,7 +12,7 @@ class ColPaliEmbeddingModel(BaseEmbeddingModel):
     late interaction retrieval which is highly effective for visual documents.
     """
     
-    def __init__(self, model_name: str = "vidore/colpali-v1.2", device: str = None):
+    def __init__(self, model_name: str = "vidore/colpali-v1.2", device: str | None = None):
         """Initialize the ColPali model.
         
         Args:

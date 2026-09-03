@@ -26,7 +26,7 @@ class IngestionPipeline:
         self.embedder = embedder
         self.vector_store = vector_store
 
-    def ingest_document(self, file_path: str | Path, metadata: Dict[str, Any] = None) -> None:
+    def ingest_document(self, file_path: str | Path, metadata: Dict[str, Any] | None = None) -> None:
         """Process a document and store its embeddings.
         
         Args:
