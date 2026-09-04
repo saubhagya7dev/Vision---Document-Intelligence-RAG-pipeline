@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import shutil
 from pathlib import Path
 import tempfile
+import traceback
 from typing import List, Dict, Any
 
 from vision_rag.config import settings
@@ -28,9 +29,10 @@ def get_components():
         loader = DocumentLoader()
         embedder = ColPaliEmbeddingModel(model_name=settings.embedding_model_name)
         vdb = QdrantVectorStore(
-            host=settings.qdrant_host, 
-            port=settings.qdrant_port, 
-            collection_name=settings.qdrant_collection_name
+            host=settings.qdrant_host,
+            port=settings.qdrant_port,
+            collection_name=settings.qdrant_collection_name,
+            in_memory=settings.qdrant_in_memory,
         )
         generator = GeminiGenerator(model_name=settings.generation_model_name, api_key=settings.google_api_key)
         
@@ -53,24 +55,26 @@ class QueryResponse(BaseModel):
 @router.post("/ingest")
 async def ingest_document(file: UploadFile = File(...)):
     """Upload and ingest a PDF document into the Vision RAG pipeline."""
-    if not file.filename.endswith('.pdf'):
+    filename = file.filename or ""
+    if not filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
         
     pipeline, _ = get_components()
     
     # Save uploaded file to a temporary location
     try:
-        suffix = Path(file.filename).suffix
+        suffix = Path(filename).suffix
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             shutil.copyfileobj(file.file, tmp)
             tmp_path = tmp.name
             
         # Ingest the document
-        pipeline.ingest_document(tmp_path, metadata={"original_filename": file.filename})
+        pipeline.ingest_document(tmp_path, metadata={"original_filename": filename})
         
-        return {"status": "success", "message": f"Successfully ingested {file.filename}"}
+        return {"status": "success", "message": f"Successfully ingested {filename}"}
         
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         # Clean up
@@ -87,4 +91,5 @@ async def query_pipeline(request: QueryRequest):
         answer, sources = synthesizer.query(user_query=request.query, top_k=request.top_k)
         return QueryResponse(answer=answer, sources=sources)
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

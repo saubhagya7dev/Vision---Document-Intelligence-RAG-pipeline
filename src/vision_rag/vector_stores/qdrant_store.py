@@ -12,18 +12,34 @@ class QdrantVectorStore(BaseVectorStore):
     which is essential for ColPali.
     """
     
-    def __init__(self, host: str = "localhost", port: int = 6333, collection_name: str = "vision_rag_docs", vector_size: int = 128):
+    def __init__(
+        self,
+        host: str = "localhost",
+        port: int = 6333,
+        collection_name: str = "vision_rag_docs",
+        vector_size: int = 128,
+        in_memory: bool = False,
+    ):
         """Initialize the Qdrant vector store.
-        
+
         Args:
             host: Qdrant server host.
             port: Qdrant server port.
             collection_name: Name of the collection to use.
             vector_size: Dimensionality of the vectors (ColPali typically uses 128).
+            in_memory: If True, use an in-process Qdrant instance (no Docker required).
+                       Data is lost on restart. Ideal for development and testing.
         """
         self.collection_name = collection_name
-        self.client = QdrantClient(host=host, port=port)
-        
+
+        if in_memory:
+            # In-memory mode: no external server needed
+            self.client = QdrantClient(":memory:")
+            print("Qdrant running in IN-MEMORY mode (data will not persist on restart).")
+        else:
+            self.client = QdrantClient(host=host, port=port)
+            print(f"Connecting to Qdrant at {host}:{port}...")
+
         # Ensure collection exists
         self._ensure_collection(vector_size)
         
@@ -60,14 +76,14 @@ class QdrantVectorStore(BaseVectorStore):
 
     def search(self, query_vector: Any, limit: int = 5) -> List[Dict[str, Any]]:
         """Search for similar vectors in Qdrant."""
-        search_result = self.client.search(
+        search_result = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=limit
         )
         
         results = []
-        for scored_point in search_result:
+        for scored_point in search_result.points:
             results.append({
                 "id": scored_point.id,
                 "score": scored_point.score,

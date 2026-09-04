@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     qdrant_collection_name: str = "vision_rag_docs"
+    qdrant_in_memory: bool = True  # Set to False when using a real Qdrant server (e.g. Docker)
     
     # Models
     embedding_model_name: str = "vidore/colpali"
