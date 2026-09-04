@@ -61,25 +61,23 @@ async def ingest_document(file: UploadFile = File(...)):
         
     pipeline, _ = get_components()
     
-    # Save uploaded file to a temporary location
+    # Save uploaded file to persistent data/ directory so it can be re-read at query time
     try:
-        suffix = Path(filename).suffix
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-            shutil.copyfileobj(file.file, tmp)
-            tmp_path = tmp.name
+        data_dir = Path("data")
+        data_dir.mkdir(exist_ok=True)
+        
+        save_path = data_dir / filename
+        with open(save_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
             
         # Ingest the document
-        pipeline.ingest_document(tmp_path, metadata={"original_filename": filename})
+        pipeline.ingest_document(str(save_path), metadata={"original_filename": filename})
         
         return {"status": "success", "message": f"Successfully ingested {filename}"}
         
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # Clean up
-        if 'tmp_path' in locals() and Path(tmp_path).exists():
-            Path(tmp_path).unlink()
 
 
 @router.post("/query", response_model=QueryResponse)
