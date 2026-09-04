@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # Models
     embedding_model_name: str = "vidore/colpali"
-    generation_model_name: str = "gemini-1.5-pro"
+    generation_model_name: str = "gemini-3.6-flash"
     
     # API Keys
     google_api_key: Optional[str] = None

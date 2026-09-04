@@ -8,7 +8,7 @@ from vision_rag.core.generator import BaseVLMGenerator
 class GeminiGenerator(BaseVLMGenerator):
     """Implementation of BaseVLMGenerator using Google's Gemini Models."""
     
-    def __init__(self, model_name: str = "gemini-1.5-pro", api_key: str | None = None):
+    def __init__(self, model_name: str = "gemini-3.6-flash", api_key: str | None = None):
         """Initialize the Gemini Generator.
         
         Args:
