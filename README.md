@@ -83,7 +83,12 @@ Vision-Native-RAG-Pipeline/
 ├── src/vision_rag/              # Main application package
 │   ├── api/                     # FastAPI endpoints
 │   │   ├── main.py              # App entrypoint & uvicorn config
-│   │   └── routes.py            # /ingest and /query routes
+│   │   └── routes.py            # /ingest, /query and UI routes
+│   │
+│   ├── static/                  # Interactive UI
+│   │   ├── index.html           # SPA Shell
+│   │   ├── styles.css           # Wallety-inspired styling
+│   │   └── app.js               # Application logic
 │   │
 │   ├── core/                    # Abstract base classes (interfaces)
 │   │   ├── embeddings.py        # BaseEmbeddingModel
@@ -171,6 +176,11 @@ uv run python -m vision_rag.api.main
 The API will be live at `http://localhost:8000`. Open `http://localhost:8000/docs` for the interactive Swagger UI.
 
 ### 4. Try It Out
+
+**The Interactive UI:**
+Open [http://localhost:8000](http://localhost:8000) in your browser to access the beautiful Wallety-inspired interactive dashboard. You can upload documents, view statistics, and chat with your PDFs visually.
+
+**Using the API:**
 
 **Upload a PDF:**
 ```bash
@@ -261,6 +271,21 @@ To add a new implementation, simply create a class that inherits from the base a
 Health check endpoint.
 
 **Response:** `{"status": "ok"}`
+
+---
+
+### `GET /api/v1/documents`
+List all uploaded PDF documents.
+
+---
+
+### `GET /api/v1/stats`
+Get dashboard statistics.
+
+---
+
+### `DELETE /api/v1/documents/{filename}`
+Delete a document and its associated vectors.
 
 ---
 
