@@ -593,7 +593,7 @@
 
         // Remove empty state reference before rebuilding
         const existingEmpty = container.querySelector('#chat-empty');
-        
+
         // Build messages HTML
         let html = '';
         chatHistory.forEach(msg => {
@@ -660,7 +660,7 @@
     }
 
     // Preview source page in modal
-    window.__previewSource = function(index) {
+    window.__previewSource = function (index) {
         const src = lastSources[index];
         if (!src) return;
 
@@ -755,7 +755,7 @@
     // Delete document
     let pendingDeleteFilename = null;
 
-    window.__deleteDoc = function(filename) {
+    window.__deleteDoc = function (filename) {
         pendingDeleteFilename = filename;
         document.getElementById('delete-modal-text').textContent = `Are you sure you want to delete "${filename}"? This will also remove its vectors from the database. This action cannot be undone.`;
         document.getElementById('delete-modal').style.display = 'flex';
