@@ -91,3 +91,28 @@ class QdrantVectorStore(BaseVectorStore):
             })
             
         return results
+
+    def get_collection_info(self) -> Dict[str, Any]:
+        """Get collection statistics from Qdrant."""
+        try:
+            info = self.client.get_collection(collection_name=self.collection_name)
+            return {
+                "vectors_count": info.vectors_count,
+                "points_count": info.points_count,
+                "status": str(info.status),
+            }
+        except Exception:
+            return {"vectors_count": 0, "points_count": 0, "status": "unknown"}
+
+    def delete_by_payload_filter(self, key: str, value: Any) -> None:
+        """Delete all vectors matching a payload field condition in Qdrant."""
+        from qdrant_client.models import Filter, FieldCondition, MatchValue
+        
+        self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(key=key, match=MatchValue(value=value))
+                ]
+            ),
+        )

@@ -27,3 +27,22 @@ class BaseVectorStore(ABC):
             List of dictionaries containing matching documents (id, score, payload).
         """
         pass
+
+    @abstractmethod
+    def get_collection_info(self) -> Dict[str, Any]:
+        """Get collection statistics.
+        
+        Returns:
+            Dictionary containing collection metadata (e.g., vector count, status).
+        """
+        pass
+
+    @abstractmethod
+    def delete_by_payload_filter(self, key: str, value: Any) -> None:
+        """Delete all vectors matching a payload field condition.
+        
+        Args:
+            key: The payload field name to filter on.
+            value: The value to match against.
+        """
+        pass

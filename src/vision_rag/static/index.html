@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vision RAG — OCR-free document intelligence pipeline using Vision-Language Models. Upload PDFs and query them visually.">
+    <title>Vision RAG — Document Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+</head>
+<body>
+    <!-- ===== TOP NAVIGATION ===== -->
+    <header id="app-header">
+        <div class="header-inner">
+            <a href="#dashboard" class="logo" id="logo-link">
+                <span class="logo-icon">✦</span>
+                <span class="logo-text">Vision RAG</span>
+            </a>
+            <nav class="nav-pill" id="main-nav">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a>
+                <a href="#upload" class="nav-item" data-page="upload">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload
+                </a>
+                <a href="#chat" class="nav-item" data-page="chat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Chat
+                </a>
+                <a href="#documents" class="nav-item" data-page="documents">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Documents
+                </a>
+            </nav>
+            <div class="header-right">
+                <div class="status-indicator" id="api-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Checking...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toast-container"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="app-main">
+
+        <!-- ========== DASHBOARD PAGE ========== -->
+        <section id="page-dashboard" class="page active">
+            <div class="dashboard-hero">
+                <div class="hero-content">
+                    <span class="badge badge-green">✦ DOCUMENT INTELLIGENCE</span>
+                    <h1 class="hero-heading">Transform Your Documents<br>Into Intelligence</h1>
+                    <p class="hero-subtitle">OCR-free RAG pipeline powered by Vision-Language Models. Upload PDFs, ask questions, and get answers that understand tables, charts, and diagrams perfectly.</p>
+                    <div class="hero-actions">
+                        <a href="#upload" class="btn btn-primary" id="hero-upload-btn">
+                            Upload Document
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </a>
+                        <a href="#chat" class="btn btn-secondary" id="hero-chat-btn">
+                            Start Querying
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-card">
+                    <div class="card-dark">
+                        <div class="card-header">
+                            <h3>Document Analytics</h3>
+                            <button class="btn-icon" id="refresh-stats-btn" title="Refresh">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                            </button>
+                        </div>
+                        <div class="analytics-chart" id="analytics-chart">
+                            <div class="chart-bars">
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 40%"></div>
+                                    <span class="chart-label">Mon</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 65%"></div>
+                                    <span class="chart-label">Tue</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 50%"></div>
+                                    <span class="chart-label">Wed</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar active" style="--h: 85%"></div>
+                                    <span class="chart-label active">Thu</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 70%"></div>
+                                    <span class="chart-label">Fri</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 30%"></div>
+                                    <span class="chart-label">Sat</span>
+                                </div>
+                                <div class="chart-bar-group">
+                                    <div class="chart-bar" style="--h: 55%"></div>
+                                    <span class="chart-label">Sun</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-footer">
+                            <div class="analytics-stat">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Total</span>
+                            </div>
+                            <div class="analytics-value">
+                                <span class="stat-number" id="hero-total-pages">0</span>
+                                <span class="stat-unit">pages indexed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-row" id="stats-row">
+                <div class="stat-card" id="stat-documents">
+                    <div class="stat-card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="stat-card-content">
+                        <span class="stat-card-value" id="stat-doc-count">—</span>
+                        <span class="stat-card-label">Documents</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="stat-pages">
+                    <div class="stat-card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div class="stat-card-content">
+                        <span class="stat-card-value" id="stat-pages-count">—</span>
+                        <span class="stat-card-label">Pages Indexed</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="stat-queries">
+                    <div class="stat-card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    </div>
+                    <div class="stat-card-content">
+                        <span class="stat-card-value" id="stat-queries-count">0</span>
+                        <span class="stat-card-label">Queries This Session</span>
+                    </div>
+                </div>
+                <div class="stat-card" id="stat-status">
+                    <div class="stat-card-icon icon-status">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <div class="stat-card-content">
+                        <span class="stat-card-value stat-status-badge" id="stat-system-status">—</span>
+                        <span class="stat-card-label">System Status</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="section-block">
+                <h2 class="section-title">Recent Activity</h2>
+                <div class="activity-list" id="activity-list">
+                    <div class="empty-state small">
+                        <p>No recent activity yet. Upload a document to get started.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== UPLOAD PAGE ========== -->
+        <section id="page-upload" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Upload Documents</h1>
+                <p class="page-subtitle">Drag & drop your PDF files to ingest them into the Vision RAG pipeline.</p>
+            </div>
+
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-zone-content">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <p class="upload-text">Drag & drop your PDF here</p>
+                    <p class="upload-hint">or click to browse • PDF files only</p>
+                    <input type="file" id="file-input" accept=".pdf" hidden>
+                </div>
+            </div>
+
+            <!-- Upload Progress -->
+            <div class="upload-progress-container" id="upload-progress-container" style="display: none;">
+                <div class="card-dark">
+                    <div class="upload-file-info">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span class="upload-filename" id="upload-filename">document.pdf</span>
+                        <span class="upload-filesize" id="upload-filesize">0 KB</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="upload-status" id="upload-status">Uploading...</div>
+                </div>
+            </div>
+
+            <!-- Upload History -->
+            <div class="section-block">
+                <h2 class="section-title">Upload History</h2>
+                <div class="upload-history" id="upload-history">
+                    <div class="empty-state small">
+                        <p>No documents uploaded in this session yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== CHAT PAGE ========== -->
+        <section id="page-chat" class="page">
+            <div class="chat-layout">
+                <div class="chat-main">
+                    <div class="chat-header">
+                        <h1 class="page-title">Chat with Documents</h1>
+                        <div class="chat-controls">
+                            <label class="control-label" for="topk-slider">
+                                Top-K:
+                                <span id="topk-value">3</span>
+                            </label>
+                            <input type="range" id="topk-slider" min="1" max="10" value="3" class="slider">
+                            <button class="btn btn-secondary btn-sm" id="clear-chat-btn">Clear Chat</button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-empty-state" id="chat-empty">
+                            <div class="empty-icon">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            </div>
+                            <h2>Ask your first question</h2>
+                            <p>Query your uploaded documents using natural language. Vision RAG understands tables, charts, and diagrams.</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper" id="chat-input-wrapper">
+                            <input type="text" id="chat-input" placeholder="Ask about your documents..." autocomplete="off">
+                            <button class="send-btn" id="send-btn" title="Send query">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="source-panel" id="source-panel">
+                    <div class="source-panel-header">
+                        <h3>Source Pages</h3>
+                        <span class="source-count" id="source-count">0 pages</span>
+                    </div>
+                    <div class="source-list" id="source-list">
+                        <div class="empty-state small">
+                            <p>Source pages will appear here after querying.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ========== DOCUMENTS PAGE ========== -->
+        <section id="page-documents" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Document Library</h1>
+                <p class="page-subtitle">Manage your uploaded documents.</p>
+            </div>
+
+            <div class="documents-grid" id="documents-grid">
+                <div class="empty-state" id="docs-empty-state">
+                    <div class="empty-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <h2>No documents yet</h2>
+                    <p>Upload your first PDF to get started.</p>
+                    <a href="#upload" class="btn btn-primary">Upload Document</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== DELETE CONFIRMATION MODAL ===== -->
+    <div class="modal-overlay" id="delete-modal" style="display: none;">
+        <div class="modal-card">
+            <h3>Delete Document</h3>
+            <p id="delete-modal-text">Are you sure you want to delete this document? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="delete-cancel-btn">Cancel</button>
+                <button class="btn btn-danger" id="delete-confirm-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PAGE IMAGE PREVIEW MODAL ===== -->
+    <div class="modal-overlay" id="preview-modal" style="display: none;">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <h3 id="preview-modal-title">Page Preview</h3>
+                <button class="btn-icon" id="preview-close-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="preview-image" src="" alt="Page preview">
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
